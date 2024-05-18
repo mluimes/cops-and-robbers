@@ -167,13 +167,39 @@ public class Controller : MonoBehaviour
 
     }
 
+    /*    public void RobberTurn()
+        {
+            clickedTile = robber.GetComponent<RobberMove>().currentTile;
+            tiles[clickedTile].current = true;
+            FindSelectableTiles(false);
+
+            // Obtener una lista de casillas seleccionables
+            List<Tile> selectableTiles = new List<Tile>();
+            foreach (Tile tile in tiles)
+            {
+                if (tile.selectable)
+                {
+                    selectableTiles.Add(tile);
+                }
+            }
+
+            // Elegir una casilla aleatoria entre las seleccionables
+            if (selectableTiles.Count > 0)
+            {
+                Tile randomTile = selectableTiles[Random.Range(0, selectableTiles.Count)];
+                robber.GetComponent<RobberMove>().MoveToTile(randomTile);
+                robber.GetComponent<RobberMove>().currentTile = randomTile.numTile;
+            }
+        }
+    */
+
     public void RobberTurn()
     {
         clickedTile = robber.GetComponent<RobberMove>().currentTile;
         tiles[clickedTile].current = true;
         FindSelectableTiles(false);
 
-        // Obtener una lista de casillas seleccionables
+        // Obtener una lista de casillas seleccionables para el primer movimiento
         List<Tile> selectableTiles = new List<Tile>();
         foreach (Tile tile in tiles)
         {
@@ -183,13 +209,74 @@ public class Controller : MonoBehaviour
             }
         }
 
-        // Elegir una casilla aleatoria entre las seleccionables
-        if (selectableTiles.Count > 0)
+        // Si no hay casillas seleccionables, no se mueve
+        if (selectableTiles.Count == 0)
         {
-            Tile randomTile = selectableTiles[Random.Range(0, selectableTiles.Count)];
-            robber.GetComponent<RobberMove>().MoveToTile(randomTile);
-            robber.GetComponent<RobberMove>().currentTile = randomTile.numTile;
+            return;
         }
+
+        // Encuentra la casilla más alejada de cualquier policía
+        Tile bestTile = FindFurthestTile(selectableTiles);
+        robber.GetComponent<RobberMove>().MoveToTile(bestTile);
+        robber.GetComponent<RobberMove>().currentTile = bestTile.numTile;
+    }
+
+    private Tile FindFurthestTile(List<Tile> selectableTiles)
+    {
+        Tile furthestTile = null;
+        int maxDistance = -1;
+
+        foreach (Tile tile in selectableTiles)
+        {
+            int minDistanceToCop = int.MaxValue;
+            foreach (GameObject cop in cops)
+            {
+                int distanceToCop = CalculateDistance(tile, tiles[cop.GetComponent<CopMove>().currentTile]);
+                if (distanceToCop < minDistanceToCop)
+                {
+                    minDistanceToCop = distanceToCop;
+                }
+            }
+
+            if (minDistanceToCop > maxDistance)
+            {
+                maxDistance = minDistanceToCop;
+                furthestTile = tile;
+            }
+        }
+
+        return furthestTile;
+    }
+
+    private int CalculateDistance(Tile startTile, Tile endTile)
+    {
+        // Implementación del BFS para calcular la distancia mínima entre startTile y endTile
+        ResetTiles();
+        Queue<Tile> queue = new Queue<Tile>();
+        startTile.visited = true;
+        queue.Enqueue(startTile);
+
+        while (queue.Count > 0)
+        {
+            Tile t = queue.Dequeue();
+            if (t == endTile)
+            {
+                return t.distance;
+            }
+
+            foreach (int i in t.adjacency)
+            {
+                Tile adjTile = tiles[i];
+                if (!adjTile.visited)
+                {
+                    adjTile.visited = true;
+                    adjTile.distance = t.distance + 1;
+                    queue.Enqueue(adjTile);
+                }
+            }
+        }
+
+        return int.MaxValue; // En caso de que no se encuentre un camino (no debería ocurrir en un tablero conectado)
     }
 
 
