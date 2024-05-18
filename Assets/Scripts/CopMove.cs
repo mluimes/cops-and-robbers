@@ -39,5 +39,16 @@ public class CopMove : Movement
         }
     }
 
-    
+    public new void MoveToTile(Tile tile)
+    {
+        // Verificar si la casilla está ocupada por otro policía
+        if (!controller.GetComponent<Controller>().IsTileOccupiedByCop(tile.numTile))
+        {
+            base.MoveToTile(tile);
+        }
+        else
+        {
+            Debug.Log("Movimiento inválido: la casilla está ocupada por otro policía.");
+        }
+    }
 }

@@ -167,31 +167,7 @@ public class Controller : MonoBehaviour
 
     }
 
-    /*    public void RobberTurn()
-        {
-            clickedTile = robber.GetComponent<RobberMove>().currentTile;
-            tiles[clickedTile].current = true;
-            FindSelectableTiles(false);
 
-            // Obtener una lista de casillas seleccionables
-            List<Tile> selectableTiles = new List<Tile>();
-            foreach (Tile tile in tiles)
-            {
-                if (tile.selectable)
-                {
-                    selectableTiles.Add(tile);
-                }
-            }
-
-            // Elegir una casilla aleatoria entre las seleccionables
-            if (selectableTiles.Count > 0)
-            {
-                Tile randomTile = selectableTiles[Random.Range(0, selectableTiles.Count)];
-                robber.GetComponent<RobberMove>().MoveToTile(randomTile);
-                robber.GetComponent<RobberMove>().currentTile = randomTile.numTile;
-            }
-        }
-    */
 
     public void RobberTurn()
     {
@@ -355,5 +331,17 @@ public class Controller : MonoBehaviour
                 }
             }
         }
+    }
+
+    public bool IsTileOccupiedByCop(int tileNumber)
+    {
+        foreach (GameObject cop in cops)
+        {
+            if (cop.GetComponent<CopMove>().currentTile == tileNumber)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 }

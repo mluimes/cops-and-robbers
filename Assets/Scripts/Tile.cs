@@ -56,5 +56,5 @@ public class Tile : MonoBehaviour
         parent = null;
         distance = 0;
     }
- 
+
 }
