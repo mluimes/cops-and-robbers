@@ -295,36 +295,40 @@ public class Controller : MonoBehaviour
     }
 
     public void FindSelectableTiles(bool cop)
+{
+    int indexCurrentTile = cop ? cops[clickedCop].GetComponent<CopMove>().currentTile : robber.GetComponent<RobberMove>().currentTile;
+
+    // La ponemos rosa porque acabamos de hacer un reset
+    tiles[indexCurrentTile].current = true;
+
+    // Cola para el BFS
+    Queue<Tile> nodes = new Queue<Tile>();
+
+    // Inicializar el BFS
+    Tile startTile = tiles[indexCurrentTile];
+    startTile.visited = true;
+    startTile.distance = 0;
+    nodes.Enqueue(startTile);
+
+    while (nodes.Count > 0)
     {
-        int indexcurrentTile = cop ? cops[clickedCop].GetComponent<CopMove>().currentTile : robber.GetComponent<RobberMove>().currentTile;
+        Tile t = nodes.Dequeue();
 
-        // La ponemos rosa porque acabamos de hacer un reset
-        tiles[indexcurrentTile].current = true;
-
-        // Cola para el BFS
-        Queue<Tile> nodes = new Queue<Tile>();
-
-        // Inicializar el BFS
-        Tile startTile = tiles[indexcurrentTile];
-        startTile.visited = true;
-        startTile.distance = 0;
-        nodes.Enqueue(startTile);
-
-        while (nodes.Count > 0)
+        if (t.distance < Constants.Distance)
         {
-            Tile t = nodes.Dequeue();
-
-            if (t.distance < Constants.Distance)
+            foreach (int i in t.adjacency)
             {
-                foreach (int i in t.adjacency)
-                {
-                    Tile adjTile = tiles[i];
+                Tile adjTile = tiles[i];
 
-                    if (!adjTile.visited)
+                if (!adjTile.visited)
+                {
+                    adjTile.parent = t;
+                    adjTile.visited = true;
+                    adjTile.distance = t.distance + 1;
+
+                    // Comprobar si la casilla está ocupada por otro policía
+                    if (!cop || !IsTileOccupiedByCop(adjTile.numTile))
                     {
-                        adjTile.parent = t;
-                        adjTile.visited = true;
-                        adjTile.distance = t.distance + 1;
                         nodes.Enqueue(adjTile);
                         adjTile.selectable = true;
                     }
@@ -332,6 +336,8 @@ public class Controller : MonoBehaviour
             }
         }
     }
+}
+
 
     public bool IsTileOccupiedByCop(int tileNumber)
     {

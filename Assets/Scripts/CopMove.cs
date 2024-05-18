@@ -1,16 +1,15 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class CopMove : Movement
-{    
+{
     public GameObject controller;
-                                    
+
     void Update()
-    {       
-        if(moving)
-        {            
-            Move();                     
+    {
+        if (moving)
+        {
+            Move();
         }
     }
 
@@ -21,34 +20,20 @@ public class CopMove : Movement
     }
 
     private void OnMouseDown()
-    {        
-        controller.GetComponent<Controller>().ClickOnCop(id);        
+    {
+        controller.GetComponent<Controller>().ClickOnCop(id);
     }
-           
+
     public void Move()
     {
-        //Si aún nos quedan casillas a las que desplazarnos
-        if(path.Count > 0)
+        if (path.Count > 0)
         {
             DoMove();
         }
-        else//Ya hemos llegado a la casilla destino
+        else
         {
             moving = false;
             controller.GetComponent<Controller>().FinishTurn();
-        }
-    }
-
-    public new void MoveToTile(Tile tile)
-    {
-        // Verificar si la casilla está ocupada por otro policía
-        if (!controller.GetComponent<Controller>().IsTileOccupiedByCop(tile.numTile))
-        {
-            base.MoveToTile(tile);
-        }
-        else
-        {
-            Debug.Log("Movimiento inválido: la casilla está ocupada por otro policía.");
         }
     }
 }
